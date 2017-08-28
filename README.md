@@ -1,8 +1,3 @@
-##Writeup Template
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
 **Vehicle Detection Project**
 
 The goals / steps of this project are the following:
@@ -15,53 +10,124 @@ The goals / steps of this project are the following:
 * Estimate a bounding box for vehicles detected.
 
 [//]: # (Image References)
-[image1]: ./examples/car_not_car.png
-[image2]: ./examples/HOG_example.jpg
-[image3]: ./examples/sliding_windows.jpg
-[image4]: ./examples/sliding_window.jpg
-[image5]: ./examples/bboxes_and_heat.png
-[image6]: ./examples/labels_map.png
-[image7]: ./examples/output_bboxes.png
+[image1]: ./output_images/hogexample.png
+[image2]: ./output_images/1scaletest6.png
+[image3]: ./output_images/heatmapexample.png
+[image4]: ./output_images/multidrawnboxes.png
+[image5]: ./output_images/normalized.png
+[image6]: ./output_images/spacialexample.png
+[image7]: ./output_images/spacialhog.png
+[image8]: ./output_images/test.png
+[image9]: ./output_images/test2.png
+[image10]: ./output_images/test3.png
+[image11]: ./output_images/carnoncar.png
+[image12]: ./output_images/ycr.png
 [video1]: ./project_video.mp4
 
-## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
-
 ---
-###Writeup / README
+**[Rubric](https://review.udacity.com/#!/rubrics/513/view) Points:**
+---
 
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
 
-You're reading it!
+**Histogram of Oriented Gradients (HOG):**
 
-###Histogram of Oriented Gradients (HOG)
+The code to extact HOG features is contained in code cell 4 of the IPython notebook. Namely in the ```get_hog_features``` function. 
+This function passes in ```orient, pix_per_cell``` and ```cell_per_block``` as paramaters and also has a boolean paramater to chose to return the HOG applied image. This function is simply a "handler" for the sklearn ```hog()``` function. 
 
-####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
+With the HOG paramaters I was simply striving for performance, as in: I wanted to achieve the best LinearSVC accuracy I could. After experimenting with these paramaters I found that these were the best set of paramaters for my purpose:
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+| Orient | Pixels per cell | Cells per block |
+|:------:|:---------------:|:---------------:|
+|  9      | 8              | 2               |
 
-I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
+
+Here is an example of a HOG image from a hood camera perspective:
 
 ![alt text][image1]
 
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
+And here is an example of a single car 
 
 
-![alt text][image2]
+---
 
-####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+**Spatial Binning:**
 
-####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+Another feature I used was to resize images to still retain useful color data, but increase the generalization of the classifier. 
+I settled on spatially binning my images to a size of 32,32. This code is located in code cell 4, function : ```spatial_bin()```
+
+Example Image:
+
+![alt text][image6]
+
+As can be seen above, the image still retains its qualities fairly well and it is easy to determine that it is a picture of a car. 
+
+
+---
+
+
+**Color Spaces and Histograms:**
+
+Before spacial binning, the image is converted into a different color space. In experimenting, I found that the 'YCrCb' color space provided better outlier elimination while still retaining correct predictions than other color spaces I experimented with. Other spaces explored were LUV, HSV, YUV, and HLS.
+
+Here is an example of a YCrCb color space converted car:
+
+
+![alt text][image12]
+
+
+After getting a color converted spacial bin, I use the function ```color_hist()``` to create histograms for each color channel of the image passed into it. These channels are then concatenated into one feature vector. 
+
+
+---
+
+
+**Training the Classifier and Predicting**
+
+I started by compiling a list of all the `vehicle` and `non-vehicle` image names to be read in later. This list was created in code cell 3. The final specs of this set were as follows:
+
+
+* Car list: 8792 images.
+* Non-car list: 8968 images.
+* Image shape: (64, 64, 3)
+
+
+Here is a composite example of one of each of the `vehicle` and `non-vehicle` classes:
+
+
+![alt text][image11]
+
+
+
+After I enumerated a list of images, I used my function ```extract_features()```--Also located in code cell 4, to apply the above steps to each image in the set. This function reads in all images from the car and non-car dataset, and then calls the previously discussed functions: ```spatial_bin()``` , ```get_hog_features``` and ```color_hist``` , then concatenates all those individual features into one feature vector that is effective for training the classifer. The function call for extracting is in code cell 5 of the IPython notebook.
+
+The classifier I used is a "Linear Support Vector Classifier" or a LinearSVM. I also experimented with a Support Vector Machine, and while the accuracy was favorable, it was just too slow for training and predicting to be entirely effective. Before training, my features were scaled and normalized to reduce the broadness and variance of the data. This can be seen in code cell 6 of the IPython notebook.
+
+Here is a histogram value comparison of a raw image from the car dataset, and that same image normalized and scaled:
+
+
+![alt text][image5]
+
+
+The code for this histogram is located in code cell 7 of the IPython notebook.
+
+Before training, I used Numpy functions to create labels for each of the car and non-car sets. A label of 1 being a car image and a label of 0 being a non-car image. The code for this is in code cell 8 of the IPython notebook. The features and labels were then split into a training and testing set to be used with the classifer. The final specs of the classifier are shown below:
+
+* Feature vector length: 8460
+* SVC Trained in: Average 20~ seconds (This would vary)
+* Accuracy: 99.61% (Would also vary)
+
+The code for classifying and predicting is included in code cell 10 of the IPython notebook.
+
+---
+
+
 
 ###Sliding Window Search
 
-####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
+
 
 I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
 
