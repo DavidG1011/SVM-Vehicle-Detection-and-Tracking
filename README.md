@@ -205,6 +205,7 @@ And the ideal single bounding box:
 
 
 Much better.
+
 ---
 
 
@@ -244,7 +245,7 @@ This function simply combines all the previously mentioned sequential steps and 
 
 ---
 
-**Discussion:***
+**Discussion:**
 
 * The main issues I had with the implementation were mostly optimization related or paramater related. Seemingly, every time I would find a reasonable value for a certain feature extraction on a single frame, my method would be crushed when it came to video output. I would often have issues with false positives or the bounding boxes maybe not quite covering the majority of the car. It was hard to find a good balance of so many different feature extractions where they would work together well.
 
