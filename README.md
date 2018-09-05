@@ -211,9 +211,9 @@ Much better.
 
 **Optimization:**
 
-To optimize classification: I played with many different color values, spatial bin sizes, heat thresholds, and scales, as mentioned above. I also explored the ever frustrating world of: "Just because my classifier is accurate doesn't mean it will be good on the video." for about 2 days or so. It was great, I'm planning to go back next summer.  
+To optimize classification: I played with many different color values, spatial bin sizes, heat thresholds, and scales, as mentioned above. I also explored the ever-frustrating world of: "Just because my classifier is accurate for a single image doesn't mean it will be accurate with a video." for about 2 days or so. It was great. I'm planning to go back next summer.  
 
-My final paramaters for everything after many tweakings are as follows:
+My final paramaters after many tweaks are as follows:
 
 * hogcolorspace = 'YCrCb'
 * spatialbinsize = (32,32)
@@ -231,7 +231,7 @@ My final paramaters for everything after many tweakings are as follows:
 
 This is from code cell 2 of the IPython notebook.
 
-Briefly I tried using the crowdai dataset to augment my training set, but this proved to be unhelpful. The amount of car images then vastly outweighed the non-car image set and created a class bias where everything was identified as a car. I would like to explore this in the future, but my classifier is marginally already good enough at identification for the time being. The extraction of those images can be found in the IPython notebook titled DataExplore.ipynb located [Here](https://github.com/DavidG1011/Udacity---Vehicle-Detection-and-Tracking/blob/master/DataExplore.ipynb)
+Briefly I tried using the crowdai dataset to augment my training set, but this proved to be unhelpful. The amount of car images then vastly outweighed the non-car image set and created a class bias where everything was identified as a car. I would like to explore this in the future, but my classifier is already good enough at identification for task. The extraction of those images can be found in the IPython notebook titled DataExplore.ipynb located [Here](https://github.com/DavidG1011/Udacity---Vehicle-Detection-and-Tracking/blob/master/DataExplore.ipynb)
 
 ---
 
